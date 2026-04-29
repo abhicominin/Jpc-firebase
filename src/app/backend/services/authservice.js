@@ -6,21 +6,17 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 const AuthService = {
 
-    // Sign in with Google
+    // Sign in with Google (redirect-based to avoid COOP issues)
     LoginWithGoogle: async () => {
         const provider = new firebase.auth.GoogleAuthProvider();
         try {
-            const userCredentials = await firebase.auth().signInWithPopup(provider);
-            return {
-                user: userCredentials.user
-            }
+            await firebase.auth().signInWithRedirect(provider);
         }
         catch (e) {
             return {
                 error: e.message
             }
-
-        }    
+        }
     },
 
     // Sign out
@@ -33,9 +29,6 @@ const AuthService = {
         try {
             const userCred = await firebase.auth().createUserWithEmailAndPassword(email, password);
             await userCred.user.updateProfile({ displayName: name });
-            await userCred.user.sendEmailVerification({
-                url: `${APP_URL}/login`
-            });
             return {
                 user: userCred.user
             }
@@ -48,8 +41,12 @@ const AuthService = {
     },
 
     // Sign in with email and password
-    signInUserWithEmailAndPassword: async (email, password) => {
+    signInUserWithEmailAndPassword: async (email, password, rememberMe = false) => {
         try {
+            const persistence = rememberMe
+                ? firebase.auth.Auth.Persistence.LOCAL
+                : firebase.auth.Auth.Persistence.SESSION;
+            await firebase.auth().setPersistence(persistence);
             const userCred = await firebase.auth().signInWithEmailAndPassword(email, password);
             return {
                 user: userCred.user

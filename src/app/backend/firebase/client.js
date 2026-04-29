@@ -1,4 +1,5 @@
 import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
 import "firebase/compat/firestore";
 
 const firebaseConfig = {
@@ -11,5 +12,8 @@ const firebaseConfig = {
 };
 
 if (!firebase.apps.length) {
+  if (!firebaseConfig.apiKey) {
+    throw new Error("Firebase env vars are not set. Check your deployment environment variables.");
+  }
   firebase.initializeApp(firebaseConfig);
 }

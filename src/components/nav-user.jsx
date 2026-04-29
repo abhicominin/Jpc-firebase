@@ -22,11 +22,13 @@ import {
 } from "@/components/ui/sidebar"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { MoreVerticalCircle01Icon, UserCircle02Icon, CreditCardIcon, Notification03Icon, Logout01Icon } from "@hugeicons/core-free-icons"
+import useAuth from "@/app/backend/context/auth"
 
 export function NavUser({
   user
 }) {
   const { isMobile } = useSidebar()
+  const { logOut } = useAuth()
 
   return (
     <SidebarMenu>
@@ -87,7 +89,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={logOut} className="text-destructive focus:text-destructive cursor-pointer">
               <HugeiconsIcon icon={Logout01Icon} strokeWidth={2} />
               Log out
             </DropdownMenuItem>

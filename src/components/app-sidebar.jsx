@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -13,6 +14,8 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react"
 import { DashboardSquare01Icon, Database01Icon, UserGroupIcon, File01Icon, Camera01Icon, UserCircle02Icon, Calendar01Icon } from "@hugeicons/core-free-icons"
 import Logo from "@/assets/svg/logo"
+import { NavUser } from "@/components/nav-user"
+import useAuth from "@/app/backend/context/auth"
 
 const navItems = [
   { title: "Dashboard", icon: DashboardSquare01Icon, href: "/dashboard" },
@@ -26,6 +29,13 @@ const navItems = [
 
 export function AppSidebar({ ...props }) {
   const pathname = usePathname()
+  const { user } = useAuth()
+
+  const navUser = {
+    name: user?.displayName || 'User',
+    email: user?.email || '',
+    avatar: user?.photoURL || '',
+  }
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -62,6 +72,9 @@ export function AppSidebar({ ...props }) {
           })}
         </SidebarMenu>
       </SidebarContent>
+      <SidebarFooter className="p-3">
+        <NavUser user={navUser} />
+      </SidebarFooter>
     </Sidebar>
   )
 }

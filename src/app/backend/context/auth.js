@@ -23,18 +23,29 @@ export const AuthProvider = ({ children }) => {
             setUser(user ?? null);
             setLoading(false);
         });
+
+        // Handle the result after Google redirect
+        firebase.auth().getRedirectResult()
+            .then((result) => {
+                if (result && result.user) {
+                    setUser(result.user);
+                    setError("");
+                    router.push('/dashboard');
+                }
+            })
+            .catch((e) => {
+                setError(e.message);
+            });
+
         return () => unsubscribe();
     }, []);
 
     const loginWithGoogle = async () => {
-        const { user, error } = await AuthService.LoginWithGoogle()
-        if (error) {
-            setError(error);
-            return;
+        const result = await AuthService.LoginWithGoogle()
+        if (result && result.error) {
+            setError(result.error);
         }
-        setUser(user ?? null);
-        setError("");
-        router.push('/dashboard');
+        // Redirect happens automatically — result handled in useEffect via getRedirectResult
     }
 
     const logOut = async () => {
@@ -51,15 +62,24 @@ export const AuthProvider = ({ children }) => {
                 return;
             }
             setUser(user ?? null);
+            // Send verification email after auth state is committed
+            try {
+                await user.sendEmailVerification({
+                    url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login`
+                });
+            } catch (e) {
+                console.error('[Auth] Failed to send verification email:', e.message);
+            }
             router.push(`/verify-email?email=${encodeURIComponent(email)}`);
         } else {
             setError("Email and password are required");
         }
     }
 
-    const signInUserWithEmailAndPassword = async (email, password) => {
+    const signInUserWithEmailAndPassword = async (email, password, rememberMe = false) => {
         if (email && password) {
-            const { user, error } = await AuthService.signInUserWithEmailAndPassword(email, password);
+            setError("");
+            const { user, error } = await AuthService.signInUserWithEmailAndPassword(email, password, rememberMe);
             if (error) {
                 setError(error);
                 return;
@@ -145,6 +165,7 @@ export const AuthProvider = ({ children }) => {
         user,
         loading,
         error,
+        clearError: () => setError(""),
         loginWithGoogle,
         logOut,
         createUserWithEmailAndPassword,

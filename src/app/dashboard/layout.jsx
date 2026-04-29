@@ -1,8 +1,11 @@
+'use client'
+
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { withProtectedRoute } from "@/app/backend/hooks/route"
 
-export default function DashboardLayout({ children }) {
+function DashboardLayout({ children }) {
   return (
     <SidebarProvider
       style={{
@@ -20,3 +23,5 @@ export default function DashboardLayout({ children }) {
     </SidebarProvider>
   )
 }
+
+export default withProtectedRoute(DashboardLayout)

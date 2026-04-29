@@ -18,7 +18,13 @@ export function withPublicRoute(Component) {
             }
         }, [auth.loading, auth.user, router]);
 
-        if (auth.loading || auth.user) {
+        // Only block render while auth state is being resolved
+        if (auth.loading) {
+            return null;
+        }
+
+        // If user is logged in, redirect is firing — don't render the public page
+        if (auth.user) {
             return null;
         }
 

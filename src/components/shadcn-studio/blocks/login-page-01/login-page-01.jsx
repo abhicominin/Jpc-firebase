@@ -1,12 +1,17 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-
 import Logo from '@/components/shadcn-studio/logo'
 import AuthBackgroundShape from '@/assets/svg/auth-background-shape'
 import LoginForm from '@/components/shadcn-studio/blocks/login-page-01/login-form'
+import useAuth from '@/app/backend/context/auth'
+import { withPublicRoute } from '@/app/backend/hooks/route'
 
 const Login = () => {
+  const { loginWithGoogle } = useAuth()
+
   return (
     <div
       className='relative flex h-auto min-h-screen items-center justify-center overflow-x-hidden px-4 py-10 sm:px-6 lg:px-8'>
@@ -16,7 +21,6 @@ const Login = () => {
       <Card className='z-1 w-full border-none shadow-md sm:max-w-lg'>
         <CardHeader className='gap-6'>
           <Logo className='gap-3' />
-
           <div>
             <CardTitle className='mb-1.5 text-2xl'>Sign in to JPC</CardTitle>
             <CardDescription className='text-base'>Ship Faster and Focus on Growth.</CardDescription>
@@ -24,16 +28,6 @@ const Login = () => {
         </CardHeader>
 
         <CardContent>
-          {/* Quick Login Buttons */}
-          <div className='mb-6 flex flex-wrap gap-4 sm:gap-6'>
-            <Button variant='outline' className='grow'>
-              Login as Management
-            </Button>
-            <Button variant='outline' className='grow'>
-              Login as Admin
-            </Button>
-          </div>
-
           {/* Login Form */}
           <div className='space-y-4'>
             <LoginForm />
@@ -51,14 +45,14 @@ const Login = () => {
               <Separator className='flex-1' />
             </div>
 
-            <Button variant='ghost' className='w-full' asChild>
-              <a href='#'>Sign in with google</a>
+            <Button variant='ghost' className='w-full' type='button' onClick={loginWithGoogle}>
+              Sign in with Google
             </Button>
           </div>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
 
-export default Login
+export default withPublicRoute(Login)
